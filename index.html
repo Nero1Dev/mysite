@@ -1,0 +1,415 @@
+<!--
+  ============================================================
+  LANDING PAGE — NAIRON DALMASO (FOTOGRAFIA)
+  ============================================================
+  Guia rápido pra editar:
+  - Cores/fontes: lá em cima no <style>, dentro de ":root"
+  - Trocar foto: procure uma div com classe "ph" (placeholder)
+    e troque por: <img src="sua-foto.jpg" alt="descrição">
+  - Trocar WhatsApp: busque "5566992701309" (aparece 3x)
+  - Cada seção do site está marcada com um comentário
+    SEÇÃO: nome antes dela
+  ============================================================
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nairon Dalmaso — Fotografia | Juína, MT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ===== PALETA DE CORES — troque os códigos hex aqui pra mudar o site inteiro ===== */
+  :root{
+    --night:#110D0A;       /* fundo principal (quase preto) */
+    --night2:#1B140F;      /* fundo secundário, um pouco mais claro */
+    --earth:#7C3220;       /* vermelho-terra (detalhes) */
+    --earth-bright:#A8462B;/* vermelho-terra mais vivo (hover/destaque) */
+    --gold:#C99A44;        /* dourado poeira — cor de destaque principal */
+    --bone:#EDE6D6;        /* texto claro / branco quente */
+    --bone-dim:#B8AF9C;    /* texto secundário, mais apagado */
+    --storm:#3B4A52;       /* azul-acinzentado, uso raro */
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--night);
+    color:var(--bone);
+    font-family:'Work Sans',sans-serif;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--earth-bright);color:var(--bone);}
+  a{color:inherit;text-decoration:none;}
+
+  .display{font-family:'Big Shoulders Display',sans-serif;text-transform:uppercase;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:50;opacity:0.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:40;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px 6vw;
+    mix-blend-mode:difference;
+  }
+  header .logo{
+    font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:22px;letter-spacing:0.5px;
+  }
+  header nav .mono{font-size:12px;letter-spacing:2px;color:var(--bone-dim);}
+
+  /* ===== SLOT DE FOTO (placeholder tracejado) =====
+     Estilo aplicado a toda div class="ph". Quando você trocar
+     a div "ph" por uma tag <img>, esse estilo deixa de ser usado
+     nesse lugar — não precisa mexer aqui. */
+  .ph{
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:
+      repeating-linear-gradient(135deg, rgba(237,230,214,0.04) 0 2px, transparent 2px 14px),
+      var(--night2);
+    border:1px dashed rgba(237,230,214,0.28);
+    color:var(--bone-dim);
+    text-align:center;
+    width:100%;height:100%;
+  }
+  .ph b{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--gold);}
+  .ph span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--bone-dim);opacity:0.8;}
+  .ph svg{opacity:0.5;}
+
+  /* HERO */
+  .hero{
+    min-height:100svh;
+    display:flex;flex-direction:column;justify-content:center;
+    position:relative;
+    padding:0 6vw;
+    background:
+      radial-gradient(ellipse 80% 60% at 75% 20%, rgba(124,50,32,0.35), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 15% 85%, rgba(201,154,68,0.12), transparent 60%),
+      var(--night);
+  }
+  .hero-eyebrow{
+    font-size:12px;letter-spacing:4px;color:var(--gold);margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .hero-eyebrow::before{content:'';width:26px;height:1px;background:var(--gold);display:inline-block;}
+  .hero h1{
+    font-size:clamp(52px,13vw,150px);
+    line-height:0.86;
+    font-weight:900;
+    color:var(--bone);
+    letter-spacing:-1px;
+  }
+  .hero h1 span{color:transparent;-webkit-text-stroke:1.5px var(--bone-dim);}
+  .hero-tagline{
+    max-width:520px;
+    margin-top:26px;
+    font-size:clamp(16px,2.4vw,20px);
+    color:var(--bone-dim);
+    font-weight:400;
+    line-height:1.5;
+  }
+  .hero-tagline b{color:var(--gold);font-weight:600;}
+  .hero-cta{
+    margin-top:38px;display:flex;gap:14px;flex-wrap:wrap;
+  }
+  .btn{
+    padding:15px 26px;border-radius:2px;font-size:13px;letter-spacing:1.5px;
+    font-family:'JetBrains Mono',monospace;font-weight:500;
+    border:1px solid var(--bone-dim);transition:all .25s ease;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-solid{background:var(--gold);color:var(--night);border-color:var(--gold);}
+  .btn-solid:hover{background:var(--bone);border-color:var(--bone);}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+
+  .hero-frame{
+    position:absolute;right:6vw;top:50%;transform:translateY(-50%) rotate(2deg);
+    width:min(30vw,260px);aspect-ratio:4/5;
+    border:6px solid var(--night2);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,154,68,0.25);
+  }
+  .hero-frame .ph{border:none;}
+  .hero-frame::after{
+    content:'REGISTRO 01';
+    position:absolute;bottom:-28px;left:0;font-family:'JetBrains Mono',monospace;
+    font-size:10px;letter-spacing:2px;color:var(--bone-dim);
+  }
+
+  .scroll-cue{
+    position:absolute;bottom:34px;left:6vw;font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:2px;color:var(--bone-dim);
+    display:flex;align-items:center;gap:10px;
+  }
+  .scroll-cue .line{width:1px;height:34px;background:var(--bone-dim);position:relative;overflow:hidden;}
+  .scroll-cue .line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--gold);animation:scrollDown 1.8s infinite ease-in-out;}
+  @keyframes scrollDown{0%{top:-100%;}100%{top:100%;}}
+
+  /* ROAD DIVIDER - signature element */
+  .road{
+    position:relative;height:64px;overflow:hidden;
+    background:var(--night2);
+    border-top:1px solid rgba(237,230,214,0.08);
+    border-bottom:1px solid rgba(237,230,214,0.08);
+    display:flex;align-items:center;
+  }
+  .road-track{
+    display:flex;white-space:nowrap;
+    animation:roadmove 22s linear infinite;
+  }
+  .road-track span{
+    font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:16px;
+    letter-spacing:3px;color:var(--bone-dim);padding:0 28px;
+    display:flex;align-items:center;gap:28px;
+  }
+  .road-track span::after{content:'—';color:var(--earth-bright);}
+  @keyframes roadmove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  section{padding:120px 6vw;position:relative;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px;flex-wrap:wrap;gap:20px;}
+  .section-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;display:block;}
+  .section-head h2{font-size:clamp(34px,5vw,64px);font-weight:800;line-height:1;}
+  .section-head p{max-width:340px;color:var(--bone-dim);font-size:14px;line-height:1.6;}
+
+  /* SOBRE */
+  .sobre{display:grid;grid-template-columns:0.9fr 1.1fr;gap:70px;align-items:center;}
+  .sobre-img{position:relative;aspect-ratio:4/5;}
+  .sobre-img .tag{
+    position:absolute;bottom:-18px;left:-18px;background:var(--earth);
+    padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;
+    z-index:2;
+  }
+  .sobre-text p{font-size:18px;line-height:1.75;color:var(--bone-dim);margin-bottom:20px;}
+  .sobre-text p:first-child{font-size:22px;color:var(--bone);font-weight:500;}
+  .stats{display:flex;gap:40px;margin-top:36px;flex-wrap:wrap;}
+  .stats div b{display:block;font-family:'Big Shoulders Display',sans-serif;font-size:36px;font-weight:800;color:var(--gold);}
+  .stats div span{font-size:11px;letter-spacing:1.5px;color:var(--bone-dim);font-family:'JetBrains Mono',monospace;}
+
+  /* PORTFOLIO */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+  .cell{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--night2);}
+  .cell .label{
+    position:absolute;left:0;right:0;bottom:0;padding:18px;
+    background:linear-gradient(to top, rgba(17,13,10,0.92), transparent);
+    display:flex;justify-content:space-between;align-items:flex-end;
+    z-index:2;
+  }
+  .cell .label b{font-family:'Big Shoulders Display',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.5px;}
+  .cell .label span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);}
+
+  /* CITACAO */
+  .citacao{
+    padding:140px 6vw;text-align:center;
+    background:linear-gradient(180deg, var(--night2), var(--night));
+  }
+  .citacao blockquote{
+    font-family:'Big Shoulders Display',sans-serif;font-weight:800;
+    font-size:clamp(28px,5.2vw,64px);line-height:1.08;max-width:900px;margin:0 auto;
+  }
+  .citacao blockquote .hl{color:var(--gold);}
+  .citacao cite{display:block;margin-top:26px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--bone-dim);font-style:normal;}
+
+  /* SERVICOS */
+  .servicos-list{border-top:1px solid rgba(237,230,214,0.12);}
+  .servico-item{
+    border-bottom:1px solid rgba(237,230,214,0.12);
+    padding:34px 0;display:grid;grid-template-columns:60px 1fr 1fr;gap:24px;align-items:center;
+    transition:padding .3s ease;
+  }
+  .servico-item:hover{padding-left:14px;background:rgba(237,230,214,0.02);}
+  .servico-item .num{font-family:'JetBrains Mono',monospace;color:var(--earth-bright);font-size:14px;}
+  .servico-item h3{font-family:'Big Shoulders Display',sans-serif;font-size:28px;font-weight:700;}
+  .servico-item p{color:var(--bone-dim);font-size:14px;line-height:1.6;}
+
+  /* CONTATO / FOOTER */
+  footer{
+    padding:110px 6vw 50px;
+    background:var(--night2);
+    position:relative;
+  }
+  .contato-top{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;margin-bottom:90px;}
+  .contato-top h2{font-size:clamp(36px,6vw,80px);font-weight:900;line-height:0.95;}
+  .contato-top h2 a{color:var(--gold);border-bottom:2px solid var(--earth);}
+  .contato-links{display:flex;flex-direction:column;gap:22px;justify-content:center;}
+  .contato-links a{
+    font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:1px;
+    padding-bottom:8px;border-bottom:1px solid rgba(237,230,214,0.15);
+    display:flex;justify-content:space-between;
+  }
+  .contato-links a span{color:var(--bone-dim);}
+  .foot-bottom{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    padding-top:26px;border-top:1px solid rgba(237,230,214,0.1);
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bone-dim);letter-spacing:1px;
+  }
+
+  @media(max-width:820px){
+    header{padding:18px 6vw;}
+    .hero-frame{display:none;}
+    .sobre{grid-template-columns:1fr;gap:40px;}
+    .grid{grid-template-columns:repeat(2,1fr);}
+    .contato-top{grid-template-columns:1fr;gap:40px;}
+    .servico-item{grid-template-columns:40px 1fr;}
+    .servico-item p{grid-column:1/-1;}
+    section{padding:90px 6vw;}
+  }
+
+  [data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  [data-reveal].in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- CABEÇALHO FIXO: seu nome + localização, some ao rolar por cima do texto -->
+<header>
+  <div class="logo">N. DALMASO</div>
+  <nav class="mono">JUÍNA — MT</nav>
+</header>
+
+<!-- SEÇÃO: HERO (primeira tela, nome grande + chamada) -->
+<section class="hero">
+  <div class="hero-eyebrow mono">FOTÓGRAFO · MATO GROSSO</div>
+  <h1>NAIRON<br><span>DALMASO</span></h1>
+  <p class="hero-tagline">Cada imagem conta a história da <b>nossa estrada</b>. Registro rodeio, retrato, editorial e cobertura de eventos no interior de Mato Grosso.</p>
+  <div class="hero-cta">
+    <!-- link do WhatsApp (1/3) — troque o número se precisar -->
+    <a class="btn btn-solid" href="https://wa.me/5566992701309" target="_blank">FALAR NO WHATSAPP →</a>
+    <a class="btn btn-ghost" href="https://instagram.com/nairon.dalmaso" target="_blank">@NAIRON.DALMASO</a>
+  </div>
+  <!-- FOTO DE DESTAQUE: troque a div.ph abaixo por
+       <img src="sua-foto.jpg" alt="Nairon Dalmaso"> — proporção 4:5 -->
+  <div class="hero-frame">
+    <div class="ph">
+      <span>FOTO DE DESTAQUE</span>
+      <b>4:5 · retrato editorial</b>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>ROLE</span><div class="line"></div></div>
+</section>
+
+<!-- FAIXA ANIMADA com suas categorias de trabalho (edite os <span> pra mudar as palavras) -->
+<div class="road">
+  <div class="road-track mono">
+    <span>RODEIO</span><span>RETRATO</span><span>EDITORIAL</span><span>EVENTOS</span><span>AÇÃO SOCIAL</span><span>ESTRADA</span>
+    <span>RODEIO</span><span>RETRATO</span><span>EDITORIAL</span><span>EVENTOS</span><span>AÇÃO SOCIAL</span><span>ESTRADA</span>
+  </div>
+</div>
+
+<!-- SEÇÃO: SOBRE (sua foto + texto de apresentação) -->
+<section class="sobre" id="sobre">
+  <!-- FOTO SOBRE: troque a div.ph por <img src="sua-foto.jpg" alt="..."> -->
+  <div class="sobre-img" data-reveal>
+    <div class="ph">
+      <span>FOTO SOBRE</span>
+      <b>4:5 · retrato seu, no trabalho</b>
+    </div>
+    <div class="tag mono">JUÍNA, MT</div>
+  </div>
+  <!-- texto de apresentação — edite os <p> livremente -->
+  <div class="sobre-text" data-reveal>
+    <span class="section-num">01 — SOBRE</span>
+    <p>Fotografia que nasce da estrada de terra, do galpão e da festa de fim de ano do interior.</p>
+    <p>Trabalho registrando o que é real: o gesto de quem monta a cavalo, o retrato sem pose, o clique no meio do evento. Baseado em Juína, Mato Grosso, disponível para ensaios, cobertura de eventos e trabalhos editoriais na região.</p>
+    <div class="stats">
+      <div><b>600+</b><span>PESSOAS ACOMPANHAM O TRABALHO</span></div>
+      <div><b>MT</b><span>REGIÃO NOROESTE, INTERIOR</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO: PORTFÓLIO (grade de 6 fotos)
+     Pra cada "cell": troque a div.ph por <img src="foto.jpg" alt="...">
+     O texto dentro de <div class="label"><b>...</b></div> é a legenda que aparece por cima da foto -->
+<section id="portfolio">
+  <div class="section-head">
+    <div>
+      <span class="section-num">02 — PORTFÓLIO</span>
+      <h2>O que registro</h2>
+    </div>
+    <p>Espaços prontos pra você encaixar suas fotos em alta qualidade — proporção 4:5 em todos.</p>
+  </div>
+  <div class="grid">
+    <!-- foto 1 -->
+    <div class="cell"><div class="ph"><span>FOTO 01</span><b>4:5</b></div><div class="label"><b>Rodeio</b><span>01</span></div></div>
+    <!-- foto 2 -->
+    <div class="cell"><div class="ph"><span>FOTO 02</span><b>4:5</b></div><div class="label"><b>Retrato</b><span>02</span></div></div>
+    <!-- foto 3 -->
+    <div class="cell"><div class="ph"><span>FOTO 03</span><b>4:5</b></div><div class="label"><b>Editorial</b><span>03</span></div></div>
+    <!-- foto 4 -->
+    <div class="cell"><div class="ph"><span>FOTO 04</span><b>4:5</b></div><div class="label"><b>Urbano</b><span>04</span></div></div>
+    <!-- foto 5 -->
+    <div class="cell"><div class="ph"><span>FOTO 05</span><b>4:5</b></div><div class="label"><b>Casal</b><span>05</span></div></div>
+    <!-- foto 6 -->
+    <div class="cell"><div class="ph"><span>FOTO 06</span><b>4:5</b></div><div class="label"><b>Ação Social</b><span>06</span></div></div>
+  </div>
+</section>
+
+<!-- SEÇÃO: CITAÇÃO DE ASSINATURA (frase de efeito, do seu próprio material) -->
+<section class="citacao">
+  <span class="section-num">03 — ASSINATURA</span>
+  <blockquote>"Cada <span class="hl">imagem</span><br>conta a história<br>da nossa <span class="hl">estrada</span>."</blockquote>
+  <cite>— NAIRON DALMASO, FOTÓGRAFO</cite>
+</section>
+
+<!-- SEÇÃO: SERVIÇOS (lista do que você oferece — pode adicionar/remover blocos "servico-item") -->
+<section id="servicos">
+  <div class="section-head">
+    <div>
+      <span class="section-num">04 — SERVIÇOS</span>
+      <h2>Como posso ajudar</h2>
+    </div>
+  </div>
+  <div class="servicos-list">
+    <div class="servico-item">
+      <span class="num mono">01</span>
+      <h3>Ensaios</h3>
+      <p>Retrato individual, família ou ensaio temático — rural, urbano ou em estúdio improvisado.</p>
+    </div>
+    <div class="servico-item">
+      <span class="num mono">02</span>
+      <h3>Eventos</h3>
+      <p>Cobertura de festas, formaturas, encontros e confraternizações em Juína e região.</p>
+    </div>
+    <div class="servico-item">
+      <span class="num mono">03</span>
+      <h3>Editorial &amp; Marca</h3>
+      <p>Fotos institucionais e editoriais para clubes, empresas e projetos regionais.</p>
+    </div>
+    <div class="servico-item">
+      <span class="num mono">04</span>
+      <h3>Ação Social</h3>
+      <p>Registro de eventos beneficentes e institucionais com foco em pessoas e comunidade.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SEÇÃO: CONTATO / RODAPÉ — link do WhatsApp (2/3 e 3/3) e Instagram/galeria -->
+<footer id="contato">
+  <div class="contato-top">
+    <h2>VAMOS REGISTRAR<br>SUA <a href="https://wa.me/5566992701309" target="_blank">HISTÓRIA</a>?</h2>
+    <div class="contato-links">
+      <a href="https://instagram.com/nairon.dalmaso" target="_blank">INSTAGRAM <span>@nairon.dalmaso</span></a>
+      <a href="https://wa.me/5566992701309" target="_blank">WHATSAPP <span>(66) 99270-1309</span></a>
+      <a href="https://banlek.com/nairon1" target="_blank">GALERIA COMPLETA <span>banlek.com/nairon1</span></a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>NAIRON DALMASO — FOTOGRAFIA</span>
+    <span>JUÍNA, MATO GROSSO, BRASIL</span>
+  </div>
+</footer>
+
+<!-- animação: revela os blocos com data-reveal suavemente ao rolar a página (não precisa mexer) -->
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:0.15});
+  document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
