@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nairondalmaso.com.br/sitemap.xml
