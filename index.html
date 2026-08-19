@@ -243,17 +243,22 @@
   .lightbox-close:hover{color:var(--gold);}
   .lightbox-arrow{
     position:absolute;top:50%;transform:translateY(-50%);
-    font-size:34px;color:var(--bone);
-    cursor:pointer;padding:10px 16px;
-    font-family:'JetBrains Mono',monospace;
-    transition:color .2s ease;
-    user-select:none;
+    width:46px;height:46px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(17,13,10,0.55);
+    border:1px solid rgba(237,230,214,0.25);
+    border-radius:50%;
+    cursor:pointer;
+    transition:background .2s ease, border-color .2s ease;
+    z-index:2;
   }
-  .lightbox-arrow:hover{color:var(--gold);}
+  .lightbox-arrow svg{width:20px;height:20px;stroke:var(--bone);}
+  .lightbox-arrow:hover{background:rgba(201,154,68,0.25);border-color:var(--gold);}
+  .lightbox-arrow:hover svg{stroke:var(--gold);}
   .lightbox-prev{left:16px;}
   .lightbox-next{right:16px;}
   @media(max-width:820px){
-    .lightbox-arrow{font-size:26px;padding:8px 10px;}
+    .lightbox-arrow{width:40px;height:40px;}
     .lightbox-close{top:16px;right:20px;font-size:32px;}
   }
 
@@ -460,9 +465,13 @@
 <!-- LIGHTBOX: estrutura do visualizador de fotos em tela cheia (não precisa mexer) -->
 <div class="lightbox" id="lightbox">
   <span class="lightbox-close" id="lightboxClose">&times;</span>
-  <span class="lightbox-arrow lightbox-prev" id="lightboxPrev">&#8249;</span>
+  <span class="lightbox-arrow lightbox-prev" id="lightboxPrev">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </span>
   <img id="lightboxImg" src="" alt="">
-  <span class="lightbox-arrow lightbox-next" id="lightboxNext">&#8250;</span>
+  <span class="lightbox-arrow lightbox-next" id="lightboxNext">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </span>
 </div>
 
 <!-- animação: revela os blocos com data-reveal suavemente ao rolar a página (não precisa mexer) -->
@@ -476,6 +485,7 @@
 <!-- LIGHTBOX: clique numa foto do portfólio pra abrir ampliada, com setas e teclado (não precisa mexer) -->
 <script>
   const galleryImgs = Array.from(document.querySelectorAll('.cell img'));
+  const heroImg = document.querySelector('.hero-frame img');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
   const closeBtn = document.getElementById('lightboxClose');
@@ -491,6 +501,16 @@
   function openLightbox(index){
     currentIndex = index;
     updateImage();
+    prevBtn.style.display = 'flex';
+    nextBtn.style.display = 'flex';
+    lightbox.classList.add('active');
+  }
+
+  function openSingleLightbox(img){
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
     lightbox.classList.add('active');
   }
 
@@ -513,6 +533,11 @@
     img.addEventListener('click', () => openLightbox(index));
   });
 
+  if(heroImg){
+    heroImg.style.cursor = 'pointer';
+    heroImg.addEventListener('click', () => openSingleLightbox(heroImg));
+  }
+
   closeBtn.addEventListener('click', closeLightbox);
   nextBtn.addEventListener('click', showNext);
   prevBtn.addEventListener('click', showPrev);
@@ -524,8 +549,8 @@
   document.addEventListener('keydown', (e) => {
     if(!lightbox.classList.contains('active')) return;
     if(e.key === 'Escape') closeLightbox();
-    if(e.key === 'ArrowRight') showNext();
-    if(e.key === 'ArrowLeft') showPrev();
+    if(e.key === 'ArrowRight' && nextBtn.style.display !== 'none') showNext();
+    if(e.key === 'ArrowLeft' && prevBtn.style.display !== 'none') showPrev();
   });
 </script>
 </body>
