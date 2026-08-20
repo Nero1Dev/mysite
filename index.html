@@ -236,9 +236,14 @@
     object-fit:contain;
     box-shadow:0 30px 80px -20px rgba(0,0,0,0.7);
     transform:scale(0.94);
-    transition:transform .3s ease;
+    transition:transform .3s ease, filter .32s ease, opacity .32s ease;
   }
   .lightbox.active img{transform:scale(1);}
+  .lightbox img.morphing{
+    opacity:0;
+    filter:blur(22px) saturate(1.4);
+    transform:scale(1.06);
+  }
   .lightbox-close{
     position:absolute;top:26px;right:30px;
     font-size:38px;color:var(--bone);
@@ -533,14 +538,25 @@
   const nextBtn = document.getElementById('lightboxNext');
   let currentIndex = 0;
 
-  function updateImage(){
-    lightboxImg.src = galleryImgs[currentIndex].src;
-    lightboxImg.alt = galleryImgs[currentIndex].alt;
+  function updateImage(morph = true){
+    if(!morph){
+      lightboxImg.src = galleryImgs[currentIndex].src;
+      lightboxImg.alt = galleryImgs[currentIndex].alt;
+      return;
+    }
+    lightboxImg.classList.add('morphing');
+    setTimeout(() => {
+      lightboxImg.src = galleryImgs[currentIndex].src;
+      lightboxImg.alt = galleryImgs[currentIndex].alt;
+      requestAnimationFrame(() => {
+        lightboxImg.classList.remove('morphing');
+      });
+    }, 260);
   }
 
   function openLightbox(index){
     currentIndex = index;
-    updateImage();
+    updateImage(false);
     prevBtn.style.display = 'flex';
     nextBtn.style.display = 'flex';
     lightbox.classList.add('active');
