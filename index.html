@@ -293,6 +293,17 @@
     background:var(--night2);
     position:relative;
   }
+  .foot-credit{
+    text-align:center;
+    margin-top:26px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.5px;
+    color:var(--bone-dim);
+    opacity:0.6;
+  }
+  .foot-credit a{color:var(--bone-dim);text-decoration:underline;transition:color .2s ease;}
+  .foot-credit a:hover{color:var(--gold);}
   .contato-top{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;margin-bottom:90px;}
   .contato-top h2{font-size:clamp(36px,6vw,80px);font-weight:900;line-height:0.95;}
   .contato-top h2 a{color:var(--gold);border-bottom:2px solid var(--earth);}
@@ -461,6 +472,7 @@
     <span>NAIRON DALMASO — FOTOGRAFIA</span>
     <span>JUÍNA, MATO GROSSO, BRASIL</span>
   </div>
+  <div class="foot-credit">Desenvolvido por <a href="https://github.com/Nero1Dev" target="_blank">Nero1dev</a></div>
 </footer>
 
 <!-- LIGHTBOX: estrutura do visualizador de fotos em tela cheia (não precisa mexer) -->
