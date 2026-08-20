@@ -139,13 +139,29 @@
   .btn-solid:hover{background:var(--bone);border-color:var(--bone);}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
 
+  .hero-frame-wrap{
+    position:absolute;right:6vw;top:50%;transform:translateY(-50%);
+    perspective:900px;
+  }
   .hero-frame{
-    position:absolute;right:6vw;top:50%;transform:translateY(-50%) rotate(2deg);
+    position:relative;
     width:min(30vw,260px);aspect-ratio:4/5;
     border:6px solid var(--night2);
     box-shadow:0 30px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,154,68,0.25);
+    transform:rotate(2deg);
+    transition:transform .15s ease-out;
+    will-change:transform;
   }
   .hero-frame .ph{border:none;}
+  .hero-frame .tilt-glare{
+    position:absolute;inset:0;
+    background:radial-gradient(circle at var(--glare-x,50%) var(--glare-y,50%), rgba(255,255,255,0.35), transparent 60%);
+    opacity:0;
+    transition:opacity .25s ease;
+    pointer-events:none;
+    mix-blend-mode:overlay;
+  }
+  .hero-frame:hover .tilt-glare{opacity:1;}
   .hero-frame::after{
     content:'REGISTRO 01';
     position:absolute;bottom:-28px;left:0;font-family:'JetBrains Mono',monospace;
@@ -345,7 +361,7 @@
 
   @media(max-width:820px){
     header{padding:18px 6vw;}
-    .hero-frame{display:none;}
+    .hero-frame-wrap{display:none;}
     .sobre{grid-template-columns:1fr;gap:40px;}
     .grid{grid-template-columns:repeat(2,1fr);}
     .contato-top{grid-template-columns:1fr;gap:40px;}
@@ -387,8 +403,11 @@
   </div>
   <!-- FOTO DE DESTAQUE: troque a div.ph abaixo por
        <img src="sua-foto.jpg" alt="Nairon Dalmaso"> — proporção 4:5 -->
-  <div class="hero-frame">
-    <img src="DSC04158.jpg" alt="Nairon Dalmaso" class="ph">
+  <div class="hero-frame-wrap">
+    <div class="hero-frame" id="tiltFrame">
+      <img src="DSC04158.jpg" alt="Nairon Dalmaso" class="ph">
+      <div class="tilt-glare"></div>
+    </div>
   </div>
   <div class="scroll-cue"><span>ROLE</span><div class="line"></div></div>
 </section>
@@ -787,6 +806,28 @@
   window.addEventListener('resize', resizeDotCanvas);
   resizeDotCanvas();
   drawDots();
+</script>
+<!-- TILTED CARD: a foto de destaque (moldura + foto + legenda) inclina em 3D acompanhando o mouse (efeito inspirado no reactbits.dev/components/tilted-card) -->
+<script>
+  const tiltFrame = document.getElementById('tiltFrame');
+  const tiltGlare = tiltFrame.querySelector('.tilt-glare');
+  const TILT_MAX = 12;
+
+  tiltFrame.addEventListener('mousemove', (e) => {
+    const rect = tiltFrame.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const rotateY = (px - 0.5) * TILT_MAX * 2;
+    const rotateX = (0.5 - py) * TILT_MAX * 2;
+
+    tiltFrame.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotate(2deg) scale(1.05)`;
+    tiltGlare.style.setProperty('--glare-x', `${px * 100}%`);
+    tiltGlare.style.setProperty('--glare-y', `${py * 100}%`);
+  });
+
+  tiltFrame.addEventListener('mouseleave', () => {
+    tiltFrame.style.transform = 'rotateX(0deg) rotateY(0deg) rotate(2deg) scale(1)';
+  });
 </script>
 </body>
 </html>
