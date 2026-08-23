@@ -1,0 +1,25 @@
+Acabei de instalar uma base minima do Arch Linux (so sistema base +
+NetworkManager, sem ambiente grafico ainda). Quero que voce monte um
+desktop Wayland completo e depois instale este rice:
+https://github.com/ilyamiro/serpantinum
+
+Faca nessa ordem, confirmando comigo antes de qualquer passo
+destrutivo ou antes de rodar scripts de terceiros que voce nao tenha
+lido inteiro primeiro:
+
+1. Detecte minha GPU (lspci) e instale os drivers corretos
+   (mesa/nvidia/amdgpu conforme o caso).
+2. Instale um compositor Wayland (Hyprland) e o essencial:
+   pipewire+wireplumber (audio), um terminal, um AUR helper
+   (paru ou yay).
+3. Leia o install.sh do Serpantinum antes de rodar (o README aponta
+   pra raw.githubusercontent.com/ilyamiro/imperative-dots/master/install.sh)
+   e me mostre um resumo do que ele faz antes de executar.
+4. Rode o instalador como usuario normal (nao root), como o README
+   pede.
+5. Configure o login grafico (display manager ou start manual via
+   .bash_profile) pra eu cair direto no Hyprland com o rice
+   aplicado.
+
+Pode ir com calma e me perguntar sempre que precisar decidir algo
+(ex: qual terminal, qual display manager).
