@@ -152,6 +152,26 @@
     transition:transform .18s cubic-bezier(.2,.8,.2,1);
     will-change:transform;
   }
+
+  /* FOLD TEXT: entrada do título da hero — cada letra "dobra" pra dentro como
+     papel se abrindo (efeito inspirado no reactbits.dev/text-animations/fold-text) */
+  #warpTitle .fold-text-segment{
+    display:inline-block;line-height:inherit;
+    perspective:700px;transform-style:preserve-3d;vertical-align:baseline;
+  }
+  #warpTitle .fold-text-piece{
+    position:relative;display:inline-block;line-height:inherit;
+    transform-style:preserve-3d;backface-visibility:hidden;
+  }
+  #warpTitle .fold-text-piece::after{
+    content:'';position:absolute;inset:-0.08em -0.02em;pointer-events:none;
+    opacity:var(--fold-crease,0);mix-blend-mode:multiply;border-radius:0.08em;
+    background:linear-gradient(180deg, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.22) 42%, rgba(255,255,255,0.26) 100%);
+  }
+  @media(prefers-reduced-motion:reduce){
+    #warpTitle .fold-text-piece{transform:none !important;}
+    #warpTitle .fold-text-piece::after{opacity:0 !important;}
+  }
   .hero-tagline{
     max-width:520px;
     margin-top:26px;
@@ -548,13 +568,9 @@
   <div class="hero-strands" id="heroStrands" aria-hidden="true"></div>
   <div class="hero-eyebrow mono">FOTÓGRAFO · MATO GROSSO</div>
   <h1 id="warpTitle">
-    <span class="warp-solid">
-      <span class="warp-letter">N</span><span class="warp-letter">A</span><span class="warp-letter">I</span><span class="warp-letter">R</span><span class="warp-letter">O</span><span class="warp-letter">N</span>
-    </span>
+    <span class="warp-solid"><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">N</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">A</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">I</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">R</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">O</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">N</span></span></span></span>
     <br>
-    <span class="warp-outline">
-      <span class="warp-letter">D</span><span class="warp-letter">A</span><span class="warp-letter">L</span><span class="warp-letter">M</span><span class="warp-letter">A</span><span class="warp-letter">S</span><span class="warp-letter">O</span>
-    </span>
+    <span class="warp-outline"><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">D</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">A</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">L</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">M</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">A</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">S</span></span></span><span class="fold-text-segment"><span class="fold-text-piece" data-fold-hinge="top"><span class="warp-letter">O</span></span></span></span>
   </h1>
   <p class="hero-tagline">Cada imagem conta a história da <b>nossa vida</b>. Registro rodeio, retrato, editorial e cobertura de eventos no interior de Mato Grosso.</p>
   <div class="hero-cta">
@@ -880,6 +896,37 @@
     applyWarp(e.clientX, e.clientY);
   });
   warpTitle.addEventListener('mouseleave', resetWarp);
+</script>
+<!-- FOLD TEXT: cada letra do título dobra pra dentro como papel se abrindo, uma vez,
+     assim que a página carrega (efeito inspirado no reactbits.dev/text-animations/fold-text).
+     Roda por cima da mesma estrutura de letras do warp-text acima — o hover continua
+     funcionando normalmente depois que a animação de entrada termina. -->
+<script type="module">
+  import { gsap } from 'https://esm.sh/gsap@3.15.0';
+
+  const foldPieces = document.querySelectorAll('#warpTitle .fold-text-piece');
+  if (foldPieces.length) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const HINGE_ORIGIN = '50% 0%';
+    const HINGE_ROTATE_X = -92;
+    const duration = reduceMotion ? 0.22 : 0.65;
+    const stagger = reduceMotion ? 0.02 : 0.045;
+
+    gsap.fromTo(foldPieces, {
+      opacity: 0,
+      rotateX: reduceMotion ? 0 : HINGE_ROTATE_X,
+      transformOrigin: HINGE_ORIGIN,
+      '--fold-crease': reduceMotion ? 0 : 0.55
+    }, {
+      opacity: 1,
+      rotateX: 0,
+      '--fold-crease': 0,
+      duration,
+      ease: reduceMotion ? 'power1.out' : 'power3.out',
+      stagger,
+      clearProps: 'willChange'
+    });
+  }
 </script>
 <!-- DECRYPTED TEXT: a citação "decodifica" letra por letra quando entra na tela (efeito inspirado no reactbits.dev/text-animations/decrypted-text) -->
 <script>
