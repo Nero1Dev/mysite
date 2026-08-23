@@ -1288,9 +1288,9 @@
   import { Renderer, Program, Mesh, Color, Triangle, RenderTarget } from 'https://esm.sh/ogl@1.0.11';
 
   const heroStrandsEl = document.getElementById('heroStrands');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const heroPrefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (heroStrandsEl && !prefersReducedMotion && window.innerWidth > 820) {
+  if (heroStrandsEl && !heroPrefersReducedMotion && window.innerWidth > 820) {
     initStrands(heroStrandsEl, {
       colors: ['#C99A44', '#A8462B', '#7C3220'],
       count: 3,
@@ -1615,10 +1615,10 @@ void main() {
 <script type="module">
   import { gsap } from 'https://esm.sh/gsap@3.15.0';
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const gridPrefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rows = document.querySelectorAll('.orcamento-row');
 
-  if (rows.length && !prefersReducedMotion && window.innerWidth > 820) {
+  if (rows.length && !gridPrefersReducedMotion && window.innerWidth > 820) {
     gsap.ticker.lagSmoothing(0);
 
     let mouseX = window.innerWidth / 2;
@@ -1889,9 +1889,9 @@ void main() {
   import { Renderer, Program, Triangle, Mesh } from 'https://esm.sh/ogl@1.0.11';
 
   const sobreRaysEl = document.getElementById('sobreRays');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sobrePrefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (sobreRaysEl && !prefersReducedMotion && window.innerWidth > 820) {
+  if (sobreRaysEl && !sobrePrefersReducedMotion && window.innerWidth > 820) {
     initSideRays(sobreRaysEl, {
       speed: 1.6,
       rayColor1: '#C99A44',
