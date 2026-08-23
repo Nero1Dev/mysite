@@ -259,7 +259,9 @@
   .section-head p{max-width:340px;color:var(--bone-dim);font-size:14px;line-height:1.6;}
 
   /* SOBRE */
-  .sobre{display:grid;grid-template-columns:0.9fr 1.1fr;gap:70px;align-items:center;}
+  .sobre{display:grid;grid-template-columns:0.9fr 1.1fr;gap:70px;align-items:center;z-index:0;}
+  .sobre-rays{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;}
+  .sobre-rays canvas{display:block;width:100%;height:100%;}
   .sobre-img{position:relative;aspect-ratio:4/5;}
   .sobre-img .tag{
     position:absolute;bottom:-18px;left:-18px;background:var(--earth);
@@ -631,6 +633,7 @@
 
 <!-- SEÇÃO: SOBRE (sua foto + texto de apresentação) -->
 <section class="sobre" id="sobre">
+  <div class="sobre-rays" id="sobreRays" aria-hidden="true"></div>
   <!-- FOTO SOBRE: troque a div.ph por <img src="sua-foto.jpg" alt="..."> -->
   <div class="sobre-img" data-reveal>
     <div class="ph">
@@ -1779,6 +1782,191 @@ void main() {
 
     servicos.addEventListener('mouseenter', activate);
     servicos.addEventListener('mouseleave', deactivate);
+  }
+</script>
+<!-- SIDE RAYS: raios de luz animados no fundo da seção Sobre (efeito inspirado no
+     reactbits.dev/backgrounds/side-rays, portado de React pra JS puro). Só renderiza
+     enquanto a seção está visível na tela (IntersectionObserver, como no original).
+     Desligado em telas pequenas e quando o usuário prefere menos animação. -->
+<script type="module">
+  import { Renderer, Program, Triangle, Mesh } from 'https://esm.sh/ogl@1.0.11';
+
+  const sobreRaysEl = document.getElementById('sobreRays');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (sobreRaysEl && !prefersReducedMotion && window.innerWidth > 820) {
+    initSideRays(sobreRaysEl, {
+      speed: 1.6,
+      rayColor1: '#C99A44',
+      rayColor2: '#A8462B',
+      intensity: 1.3,
+      spread: 2,
+      origin: 'top-right',
+      tilt: 0,
+      saturation: 1.3,
+      blend: 0.7,
+      falloff: 1.6,
+      opacity: 0.55
+    });
+  }
+
+  function initSideRays(container, opts) {
+    const hexToRgb = hex => {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
+    };
+    const originToFlip = origin => {
+      switch (origin) {
+        case 'top-left': return [1, 0];
+        case 'bottom-right': return [0, 1];
+        case 'bottom-left': return [1, 1];
+        default: return [0, 0];
+      }
+    };
+
+    const VERT = `
+attribute vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}`;
+
+    const FRAG = `precision highp float;
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform float iSpeed;
+uniform vec3 iRayColor1;
+uniform vec3 iRayColor2;
+uniform float iIntensity;
+uniform float iSpread;
+uniform float iFlipX;
+uniform float iFlipY;
+uniform float iTilt;
+uniform float iSaturation;
+uniform float iBlend;
+uniform float iFalloff;
+uniform float iOpacity;
+
+float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed) {
+  vec2 sourceToCoord = coord - raySource;
+  float cosAngle = dot(normalize(sourceToCoord), rayRefDirection);
+  return clamp(
+    (0.45 + 0.15 * sin(cosAngle * seedA + iTime * speed)) +
+    (0.3 + 0.2 * cos(-cosAngle * seedB + iTime * speed)),
+    0.0, 1.0) *
+    clamp((iResolution.x - length(sourceToCoord)) / iResolution.x, 0.5, 1.0);
+}
+
+void main() {
+  vec2 fragCoord = gl_FragCoord.xy;
+  if (iFlipX > 0.5) fragCoord.x = iResolution.x - fragCoord.x;
+  if (iFlipY > 0.5) fragCoord.y = iResolution.y - fragCoord.y;
+
+  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);
+  vec2 rayPos = vec2(iResolution.x * 1.1, -0.5 * iResolution.y);
+
+  float tiltRad = iTilt * 3.14159265 / 180.0;
+  float cs = cos(tiltRad);
+  float sn = sin(tiltRad);
+  vec2 rel = coord - rayPos;
+  vec2 tiltedCoord = vec2(rel.x * cs - rel.y * sn, rel.x * sn + rel.y * cs) + rayPos;
+
+  float halfSpread = iSpread * 0.275;
+  vec2 rayRefDir1 = normalize(vec2(cos(0.785398 + halfSpread), sin(0.785398 + halfSpread)));
+  vec2 rayRefDir2 = normalize(vec2(cos(0.785398 - halfSpread), sin(0.785398 - halfSpread)));
+
+  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);
+  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2);
+
+  vec4 color = rays1 * (1.0 - iBlend) * 0.9 + rays2 * iBlend * 0.9;
+
+  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / iResolution.y;
+  float brightness = iIntensity * 0.4 / pow(max(distanceToLight, 0.001), iFalloff);
+  color.rgb *= brightness;
+
+  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+  color.rgb = mix(vec3(gray), color.rgb, iSaturation);
+
+  color.a = max(color.r, max(color.g, color.b)) * iOpacity;
+  gl_FragColor = color;
+}`;
+
+    let renderer = null, uniforms = null, mesh = null, animId = null, cleanup = null;
+
+    async function setup() {
+      await new Promise(resolve => setTimeout(resolve, 10));
+      if (!container.isConnected) return null;
+
+      renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+      const gl = renderer.gl;
+      gl.canvas.style.width = '100%';
+      gl.canvas.style.height = '100%';
+
+      while (container.firstChild) container.removeChild(container.firstChild);
+      container.appendChild(gl.canvas);
+
+      const [flipX, flipY] = originToFlip(opts.origin);
+      uniforms = {
+        iTime: { value: 0 },
+        iResolution: { value: [1, 1] },
+        iSpeed: { value: opts.speed },
+        iRayColor1: { value: hexToRgb(opts.rayColor1) },
+        iRayColor2: { value: hexToRgb(opts.rayColor2) },
+        iIntensity: { value: opts.intensity },
+        iSpread: { value: opts.spread },
+        iFlipX: { value: flipX },
+        iFlipY: { value: flipY },
+        iTilt: { value: opts.tilt },
+        iSaturation: { value: opts.saturation },
+        iBlend: { value: opts.blend },
+        iFalloff: { value: opts.falloff },
+        iOpacity: { value: opts.opacity }
+      };
+
+      const geometry = new Triangle(gl);
+      const program = new Program(gl, { vertex: VERT, fragment: FRAG, uniforms });
+      mesh = new Mesh(gl, { geometry, program });
+
+      function updateSize() {
+        if (!renderer) return;
+        renderer.dpr = Math.min(window.devicePixelRatio, 2);
+        const { clientWidth: w, clientHeight: h } = container;
+        renderer.setSize(w, h);
+        uniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
+      }
+
+      function loop(t) {
+        if (!renderer || !uniforms || !mesh) return;
+        uniforms.iTime.value = t * 0.001;
+        renderer.render({ scene: mesh });
+        animId = requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', updateSize);
+      updateSize();
+      animId = requestAnimationFrame(loop);
+
+      return () => {
+        if (animId) cancelAnimationFrame(animId);
+        window.removeEventListener('resize', updateSize);
+        const loseCtx = gl.getExtension('WEBGL_lose_context');
+        if (loseCtx) loseCtx.loseContext();
+        if (gl.canvas.parentNode) gl.canvas.parentNode.removeChild(gl.canvas);
+        renderer = null; uniforms = null; mesh = null;
+      };
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      const entry = entries[0];
+      if (entry.isIntersecting) {
+        if (!cleanup) setup().then(fn => { cleanup = fn; });
+      } else if (cleanup) {
+        cleanup();
+        cleanup = null;
+      }
+    }, { threshold: 0.1 });
+
+    observer.observe(container);
   }
 </script>
 </body>
