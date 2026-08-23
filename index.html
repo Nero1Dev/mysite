@@ -498,8 +498,7 @@
 
 <!-- FAIXA ANIMADA com suas categorias de trabalho (edite os <span> pra mudar as palavras) -->
 <div class="road">
-  <div class="road-track mono">
-    <span>RODEIO</span><span>RETRATO</span><span>EDITORIAL</span><span>EVENTOS</span><span>AÇÃO SOCIAL</span><span>PRÉ WEDDING</span>
+  <div class="road-track mono" id="roadTrack">
     <span>RODEIO</span><span>RETRATO</span><span>EDITORIAL</span><span>EVENTOS</span><span>AÇÃO SOCIAL</span><span>PRÉ WEDDING</span>
   </div>
 </div>
@@ -635,6 +634,25 @@
   </span>
 </div>
 
+<!-- FAIXA ANIMADA: repete as categorias o suficiente pra cobrir a tela inteira antes
+     de dar a volta — em telas largas 2 cópias fixas deixavam um vão em branco no
+     fim do loop; aqui a quantidade de cópias se ajusta à largura da janela -->
+<script>
+  const roadTrack = document.getElementById('roadTrack');
+  const roadBaseHTML = roadTrack.innerHTML;
+  const ROAD_BASE_DURATION = 22;
+
+  function buildRoadTrack(){
+    roadTrack.innerHTML = roadBaseHTML;
+    const baseWidth = roadTrack.scrollWidth;
+    const repeats = Math.max(1, Math.ceil(window.innerWidth / baseWidth) + 1);
+    roadTrack.innerHTML = roadBaseHTML.repeat(repeats * 2);
+    roadTrack.style.animationDuration = `${repeats * ROAD_BASE_DURATION}s`;
+  }
+
+  buildRoadTrack();
+  window.addEventListener('resize', buildRoadTrack);
+</script>
 <!-- animação: revela os blocos com data-reveal suavemente ao rolar a página (não precisa mexer) -->
 <script>
   const io = new IntersectionObserver((entries)=>{
