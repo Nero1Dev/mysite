@@ -550,11 +550,22 @@
   .contato-top h2 a{color:var(--gold);border-bottom:2px solid var(--earth);}
   .contato-links{display:flex;flex-direction:column;gap:22px;justify-content:center;}
   .contato-links a{
+    position:relative;
     font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:1px;
     padding-bottom:8px;border-bottom:1px solid rgba(237,230,214,0.15);
     display:flex;justify-content:space-between;
+    transition:color .25s ease, padding-left .25s ease;
   }
-  .contato-links a span{color:var(--bone-dim);}
+  .contato-links a::after{
+    content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;
+    background:var(--gold);
+    transform:scaleX(0);transform-origin:left;
+    transition:transform .3s ease;
+  }
+  .contato-links a span{color:var(--bone-dim);transition:color .25s ease;}
+  .contato-links a:hover{color:var(--gold);padding-left:10px;}
+  .contato-links a:hover span{color:var(--gold);opacity:0.8;}
+  .contato-links a:hover::after{transform:scaleX(1);}
   .foot-bottom{
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
     padding-top:26px;border-top:1px solid rgba(237,230,214,0.1);
