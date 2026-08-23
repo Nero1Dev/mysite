@@ -506,6 +506,28 @@
   .servico-item h3{font-family:'Big Shoulders Display',sans-serif;font-size:28px;font-weight:700;}
   .servico-item p{color:var(--bone-dim);font-size:14px;line-height:1.6;}
 
+  /* TARGET CURSOR: cursor customizado que "trava" com 4 cantos nos itens de serviço
+     ao passar o mouse (efeito inspirado no reactbits.dev/animations/target-cursor).
+     Fica escondido/inativo fora da seção de serviços — ver script no fim do body. */
+  .target-cursor-wrapper{
+    position:fixed;top:0;left:0;width:0;height:0;
+    pointer-events:none;z-index:9999;
+    mix-blend-mode:difference;
+    opacity:0;transition:opacity .15s ease;
+  }
+  .target-cursor-dot{
+    position:absolute;left:50%;top:50%;width:4px;height:4px;
+    border-radius:50%;transform:translate(-50%,-50%);will-change:transform;
+  }
+  .target-cursor-corner{
+    position:absolute;left:50%;top:50%;width:12px;height:12px;
+    border:3px solid;will-change:transform;
+  }
+  .target-cursor-corner.corner-tl{transform:translate(-150%,-150%);border-right:none;border-bottom:none;}
+  .target-cursor-corner.corner-tr{transform:translate(50%,-150%);border-left:none;border-bottom:none;}
+  .target-cursor-corner.corner-br{transform:translate(50%,50%);border-left:none;border-top:none;}
+  .target-cursor-corner.corner-bl{transform:translate(-150%,50%);border-right:none;border-top:none;}
+
   /* CONTATO / FOOTER */
   footer{
     padding:110px 6vw 50px;
@@ -1544,6 +1566,209 @@ void main() {
       submitBtn.disabled = false;
     }
   });
+</script>
+<!-- TARGET CURSOR: cursor customizado com 4 cantos que "travam" no item de serviço sob o
+     mouse (efeito inspirado no reactbits.dev/animations/target-cursor, portado de React
+     pra JS puro). Só fica ativo enquanto o mouse está dentro da seção de serviços —
+     fora dali o cursor normal do sistema volta. Desligado em telas de toque/mobile. -->
+<script type="module">
+  import { gsap } from 'https://esm.sh/gsap@3.15.0';
+
+  const servicos = document.getElementById('servicos');
+  const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 768;
+
+  if (servicos && !isTouchDevice) {
+    const TARGET_SELECTOR = '.servico-item';
+    const SPIN_DURATION = 2;
+    const HOVER_DURATION = 0.2;
+    const CURSOR_COLOR = '#C99A44';
+    const BORDER_WIDTH = 3;
+    const CORNER_SIZE = 12;
+
+    const cursor = document.createElement('div');
+    cursor.className = 'target-cursor-wrapper';
+    cursor.innerHTML = `
+      <div class="target-cursor-dot" style="background-color:${CURSOR_COLOR}"></div>
+      <div class="target-cursor-corner corner-tl" style="border-color:${CURSOR_COLOR}"></div>
+      <div class="target-cursor-corner corner-tr" style="border-color:${CURSOR_COLOR}"></div>
+      <div class="target-cursor-corner corner-br" style="border-color:${CURSOR_COLOR}"></div>
+      <div class="target-cursor-corner corner-bl" style="border-color:${CURSOR_COLOR}"></div>
+    `;
+    document.body.appendChild(cursor);
+    const dot = cursor.querySelector('.target-cursor-dot');
+    const corners = cursor.querySelectorAll('.target-cursor-corner');
+
+    let spinTl = null;
+    let activeTarget = null;
+    let currentLeaveHandler = null;
+    let resumeTimeout = null;
+    let targetCornerPositions = null;
+    let originalCursor = '';
+    let active = false;
+    const activeStrength = { current: 0 };
+
+    function moveCursor(x, y){
+      gsap.to(cursor, { x, y, duration: 0.1, ease: 'power3.out' });
+    }
+
+    function createSpinTimeline(){
+      if (spinTl) spinTl.kill();
+      spinTl = gsap.timeline({ repeat: -1 }).to(cursor, { rotation: '+=360', duration: SPIN_DURATION, ease: 'none' });
+    }
+
+    function cleanupTarget(target){
+      if (currentLeaveHandler) target.removeEventListener('mouseleave', currentLeaveHandler);
+      currentLeaveHandler = null;
+    }
+
+    const tickerFn = () => {
+      const strength = activeStrength.current;
+      if (strength === 0 || !targetCornerPositions) return;
+      const cursorX = gsap.getProperty(cursor, 'x');
+      const cursorY = gsap.getProperty(cursor, 'y');
+      corners.forEach((corner, i) => {
+        const currentX = gsap.getProperty(corner, 'x');
+        const currentY = gsap.getProperty(corner, 'y');
+        const targetX = targetCornerPositions[i].x - cursorX;
+        const targetY = targetCornerPositions[i].y - cursorY;
+        const finalX = currentX + (targetX - currentX) * strength;
+        const finalY = currentY + (targetY - currentY) * strength;
+        const duration = strength >= 0.99 ? 0.2 : 0.05;
+        gsap.to(corner, { x: finalX, y: finalY, duration, ease: 'power1.out', overwrite: 'auto' });
+      });
+    };
+
+    function moveHandler(e){ moveCursor(e.clientX, e.clientY); }
+
+    function scrollHandler(){
+      if (!activeTarget) return;
+      const mouseX = gsap.getProperty(cursor, 'x');
+      const mouseY = gsap.getProperty(cursor, 'y');
+      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+      const isStillOverTarget = elementUnderMouse &&
+        (elementUnderMouse === activeTarget || elementUnderMouse.closest(TARGET_SELECTOR) === activeTarget);
+      if (!isStillOverTarget) currentLeaveHandler?.();
+    }
+
+    function mouseDownHandler(){
+      gsap.to(dot, { scale: 0.7, duration: 0.3 });
+      gsap.to(cursor, { scale: 0.9, duration: 0.2 });
+    }
+    function mouseUpHandler(){
+      gsap.to(dot, { scale: 1, duration: 0.3 });
+      gsap.to(cursor, { scale: 1, duration: 0.2 });
+    }
+
+    function enterHandler(e){
+      const target = e.target.closest(TARGET_SELECTOR);
+      if (!target || !servicos.contains(target)) return;
+      if (activeTarget === target) return;
+      if (activeTarget) cleanupTarget(activeTarget);
+      if (resumeTimeout){ clearTimeout(resumeTimeout); resumeTimeout = null; }
+
+      activeTarget = target;
+      corners.forEach(c => gsap.killTweensOf(c, 'x,y'));
+      gsap.killTweensOf(cursor, 'rotation');
+      spinTl?.pause();
+      gsap.set(cursor, { rotation: 0 });
+
+      const rect = target.getBoundingClientRect();
+      const cursorX = gsap.getProperty(cursor, 'x');
+      const cursorY = gsap.getProperty(cursor, 'y');
+
+      targetCornerPositions = [
+        { x: rect.left - BORDER_WIDTH, y: rect.top - BORDER_WIDTH },
+        { x: rect.right + BORDER_WIDTH - CORNER_SIZE, y: rect.top - BORDER_WIDTH },
+        { x: rect.right + BORDER_WIDTH - CORNER_SIZE, y: rect.bottom + BORDER_WIDTH - CORNER_SIZE },
+        { x: rect.left - BORDER_WIDTH, y: rect.bottom + BORDER_WIDTH - CORNER_SIZE }
+      ];
+
+      gsap.ticker.add(tickerFn);
+      gsap.to(activeStrength, { current: 1, duration: HOVER_DURATION, ease: 'power2.out' });
+
+      corners.forEach((corner, i) => {
+        gsap.to(corner, {
+          x: targetCornerPositions[i].x - cursorX,
+          y: targetCornerPositions[i].y - cursorY,
+          duration: 0.2,
+          ease: 'power2.out'
+        });
+      });
+
+      const leaveHandler = () => {
+        gsap.ticker.remove(tickerFn);
+        targetCornerPositions = null;
+        gsap.set(activeStrength, { current: 0, overwrite: true });
+        activeTarget = null;
+
+        gsap.killTweensOf(corners, 'x,y');
+        const positions = [
+          { x: -CORNER_SIZE * 1.5, y: -CORNER_SIZE * 1.5 },
+          { x: CORNER_SIZE * 0.5, y: -CORNER_SIZE * 1.5 },
+          { x: CORNER_SIZE * 0.5, y: CORNER_SIZE * 0.5 },
+          { x: -CORNER_SIZE * 1.5, y: CORNER_SIZE * 0.5 }
+        ];
+        corners.forEach((corner, i) => {
+          gsap.to(corner, { x: positions[i].x, y: positions[i].y, duration: 0.3, ease: 'power3.out' });
+        });
+
+        resumeTimeout = setTimeout(() => {
+          if (!activeTarget && spinTl){
+            const currentRotation = gsap.getProperty(cursor, 'rotation');
+            const normalizedRotation = currentRotation % 360;
+            spinTl.kill();
+            spinTl = gsap.timeline({ repeat: -1 }).to(cursor, { rotation: '+=360', duration: SPIN_DURATION, ease: 'none' });
+            gsap.to(cursor, {
+              rotation: normalizedRotation + 360,
+              duration: SPIN_DURATION * (1 - normalizedRotation / 360),
+              ease: 'none',
+              onComplete: () => spinTl?.restart()
+            });
+          }
+          resumeTimeout = null;
+        }, 50);
+
+        cleanupTarget(target);
+      };
+
+      currentLeaveHandler = leaveHandler;
+      target.addEventListener('mouseleave', leaveHandler);
+    }
+
+    function activate(){
+      if (active) return;
+      active = true;
+      originalCursor = document.body.style.cursor;
+      document.body.style.cursor = 'none';
+      gsap.set(cursor, { xPercent: -50, yPercent: -50 });
+      cursor.style.opacity = '1';
+      createSpinTimeline();
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseover', enterHandler, { passive: true });
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      window.addEventListener('mousedown', mouseDownHandler);
+      window.addEventListener('mouseup', mouseUpHandler);
+    }
+
+    function deactivate(){
+      if (!active) return;
+      active = false;
+      window.removeEventListener('mousemove', moveHandler);
+      window.removeEventListener('mouseover', enterHandler);
+      window.removeEventListener('scroll', scrollHandler);
+      window.removeEventListener('mousedown', mouseDownHandler);
+      window.removeEventListener('mouseup', mouseUpHandler);
+      if (activeTarget) currentLeaveHandler?.();
+      if (resumeTimeout){ clearTimeout(resumeTimeout); resumeTimeout = null; }
+      gsap.ticker.remove(tickerFn);
+      spinTl?.kill();
+      cursor.style.opacity = '0';
+      document.body.style.cursor = originalCursor;
+    }
+
+    servicos.addEventListener('mouseenter', activate);
+    servicos.addEventListener('mouseleave', deactivate);
+  }
 </script>
 </body>
 </html>
