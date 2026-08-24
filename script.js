@@ -526,3 +526,66 @@
       submitBtn.disabled = false;
     }
   });
+
+/* RÁDIO: player flutuante que toca a Band FM Juína ao vivo. Clique no ícone (radioToggle)
+   abre/fecha o mini painel; clique no botão de play (radioPlayBtn) conecta no stream —
+   o <audio> só recebe o "src" nesse clique (não antes) pra não gastar dados carregando
+   rádio sem o visitante pedir. O src é removido ao pausar porque é transmissão AO VIVO:
+   sem isso, dar play de novo tocaria a partir do que já tinha bufferizado, não do momento
+   atual da transmissão. */
+  const RADIO_STREAM_URL = 'https://wms5.webradios.com.br:19042/9042';
+  const radioWidget = document.getElementById('radioWidget');
+  const radioToggle = document.getElementById('radioToggle');
+  const radioPlayBtn = document.getElementById('radioPlayBtn');
+  const radioAudio = document.getElementById('radioAudio');
+  const radioStatus = document.getElementById('radioStatus');
+
+  let radioOpen = false;
+
+  function setRadioStatus(text){
+    radioStatus.textContent = text;
+  }
+
+  function openRadioPanel(){
+    radioOpen = true;
+    radioWidget.classList.add('open');
+    radioToggle.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeRadioPanel(){
+    radioOpen = false;
+    radioWidget.classList.remove('open');
+    radioToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  radioToggle.addEventListener('click', () => {
+    if (radioOpen) closeRadioPanel(); else openRadioPanel();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (radioOpen && !radioWidget.contains(e.target)) closeRadioPanel();
+  });
+
+  radioPlayBtn.addEventListener('click', () => {
+    if (radioAudio.paused) {
+      if (!radioAudio.src) radioAudio.src = RADIO_STREAM_URL;
+      setRadioStatus('CONECTANDO...');
+      radioAudio.play().catch(() => setRadioStatus('SEM SINAL — TENTE DE NOVO'));
+    } else {
+      radioAudio.pause();
+      radioAudio.removeAttribute('src');
+      radioAudio.load();
+      radioWidget.classList.remove('playing');
+      setRadioStatus('PARADO');
+    }
+  });
+
+  radioAudio.addEventListener('playing', () => {
+    radioWidget.classList.add('playing');
+    setRadioStatus('AO VIVO');
+  });
+
+  radioAudio.addEventListener('error', () => {
+    radioWidget.classList.remove('playing');
+    setRadioStatus('SEM SINAL — TENTE DE NOVO');
+  });

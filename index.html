@@ -255,6 +255,31 @@
   </span>
 </div>
 
+<!-- RÁDIO: player flutuante — clique no ícone pra abrir o mini player e no botão
+     de play pra iniciar a transmissão ao vivo da Band FM Juína -->
+<div class="radio-widget" id="radioWidget">
+  <div class="radio-panel" id="radioPanel">
+    <div class="radio-info">
+      <span class="radio-name mono">BAND FM JUÍNA</span>
+      <span class="radio-status mono" id="radioStatus">PARADO</span>
+    </div>
+    <button class="radio-play" id="radioPlayBtn" aria-label="Tocar rádio ao vivo">
+      <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+    </button>
+  </div>
+  <button class="radio-toggle" id="radioToggle" aria-label="Ouvir rádio ao vivo" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="2"></circle>
+      <path d="M8.5 8.5a5 5 0 0 0 0 7"></path>
+      <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+      <path d="M5.5 5.5a9 9 0 0 0 0 13"></path>
+      <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+    </svg>
+  </button>
+  <audio id="radioAudio" preload="none"></audio>
+</div>
+
 <script src="script.js"></script>
 <!-- FOLD TEXT: cada letra do título dobra pra dentro como papel se abrindo, uma vez,
      assim que a página carrega (efeito inspirado no reactbits.dev/text-animations/fold-text).
