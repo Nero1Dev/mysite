@@ -533,8 +533,11 @@
    player. A ordem do array é a ordem de reprodução, e ao terminar a última ela volta
    pra primeira sozinha. */
   const PLAYLIST = [
-    // { file: 'musicas/01-nome-do-arquivo.mp3', title: 'Nome da música 01' },
-    // { file: 'musicas/02-nome-do-arquivo.mp3', title: 'Nome da música 02' },
+    { file: 'musicas/alex-morgan-lofi.mp3', title: 'Lofi — Alex Morgan' },
+    { file: 'musicas/alex-morgan-lofi-chill-vlog-beats.mp3', title: 'Lofi Chill Vlog Beats — Alex Morgan' },
+    { file: 'musicas/apalonbeats-lofi.mp3', title: 'Lofi — ApalonBeats' },
+    { file: 'musicas/kulakovka-lofi-relax.mp3', title: 'Lofi Relax — Kulakovka' },
+    { file: 'musicas/pulsebox-lofi.mp3', title: 'Lofi — Pulsebox' },
   ];
 
   const musicWidget = document.getElementById('musicWidget');
