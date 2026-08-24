@@ -54,6 +54,7 @@
     prevBtn.style.display = 'flex';
     nextBtn.style.display = 'flex';
     lightbox.classList.add('active');
+    document.documentElement.classList.add('scroll-lock');
   }
 
   function openSingleLightbox(img){
@@ -62,10 +63,12 @@
     prevBtn.style.display = 'none';
     nextBtn.style.display = 'none';
     lightbox.classList.add('active');
+    document.documentElement.classList.add('scroll-lock');
   }
 
   function closeLightbox(){
     lightbox.classList.remove('active');
+    document.documentElement.classList.remove('scroll-lock');
   }
 
   function showNext(){

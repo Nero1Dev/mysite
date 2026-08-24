@@ -16,6 +16,11 @@
     color:var(--bone);
     font-family:'Work Sans',sans-serif;
   }
+  /* trava o scroll do site atrás da lightbox enquanto ela está aberta (ver openLightbox/closeLightbox
+     no script.js) — precisa ir no <html>, não só no <body>: como o html já tem overflow-x:hidden fixo
+     acima, o overflow do body não propaga pro scroll da página (regra do CSSOM-View), então só travar
+     o body não impede o scroll continuar rolando por trás da lightbox */
+  html.scroll-lock{overflow:hidden;}
   ::selection{background:var(--earth-bright);color:var(--bone);}
   a{color:inherit;text-decoration:none;}
 
