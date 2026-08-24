@@ -527,65 +527,98 @@
     }
   });
 
-/* RÁDIO: player flutuante que toca a Band FM Juína ao vivo. Clique no ícone (radioToggle)
-   abre/fecha o mini painel; clique no botão de play (radioPlayBtn) conecta no stream —
-   o <audio> só recebe o "src" nesse clique (não antes) pra não gastar dados carregando
-   rádio sem o visitante pedir. O src é removido ao pausar porque é transmissão AO VIVO:
-   sem isso, dar play de novo tocaria a partir do que já tinha bufferizado, não do momento
-   atual da transmissão. */
-  const RADIO_STREAM_URL = 'https://wms5.webradios.com.br:19042/9042';
-  const radioWidget = document.getElementById('radioWidget');
-  const radioToggle = document.getElementById('radioToggle');
-  const radioPlayBtn = document.getElementById('radioPlayBtn');
-  const radioAudio = document.getElementById('radioAudio');
-  const radioStatus = document.getElementById('radioStatus');
+/* PLAYLIST: player flutuante que toca músicas da pasta "musicas/". Pra adicionar uma
+   faixa: (1) coloque o arquivo .mp3 dentro da pasta "musicas/" e (2) adicione uma linha
+   aqui embaixo, no array PLAYLIST, com o nome do arquivo e o título que deve aparecer no
+   player. A ordem do array é a ordem de reprodução, e ao terminar a última ela volta
+   pra primeira sozinha. */
+  const PLAYLIST = [
+    // { file: 'musicas/01-nome-do-arquivo.mp3', title: 'Nome da música 01' },
+    // { file: 'musicas/02-nome-do-arquivo.mp3', title: 'Nome da música 02' },
+  ];
 
-  let radioOpen = false;
+  const musicWidget = document.getElementById('musicWidget');
+  const musicToggle = document.getElementById('musicToggle');
+  const musicPlayBtn = document.getElementById('musicPlayBtn');
+  const musicPrevBtn = document.getElementById('musicPrevBtn');
+  const musicNextBtn = document.getElementById('musicNextBtn');
+  const musicAudio = document.getElementById('musicAudio');
+  const musicTrackEl = document.getElementById('musicTrack');
+  const musicStatusEl = document.getElementById('musicStatus');
 
-  function setRadioStatus(text){
-    radioStatus.textContent = text;
+  let musicOpen = false;
+  let trackIndex = 0;
+
+  if (PLAYLIST.length) {
+    musicTrackEl.textContent = PLAYLIST[0].title;
+    musicStatusEl.textContent = 'PARADO';
+  } else {
+    musicWidget.classList.add('empty');
   }
 
-  function openRadioPanel(){
-    radioOpen = true;
-    radioWidget.classList.add('open');
-    radioToggle.setAttribute('aria-expanded', 'true');
+  function setMusicStatus(text){
+    musicStatusEl.textContent = text;
   }
 
-  function closeRadioPanel(){
-    radioOpen = false;
-    radioWidget.classList.remove('open');
-    radioToggle.setAttribute('aria-expanded', 'false');
+  function openMusicPanel(){
+    musicOpen = true;
+    musicWidget.classList.add('open');
+    musicToggle.setAttribute('aria-expanded', 'true');
   }
 
-  radioToggle.addEventListener('click', () => {
-    if (radioOpen) closeRadioPanel(); else openRadioPanel();
+  function closeMusicPanel(){
+    musicOpen = false;
+    musicWidget.classList.remove('open');
+    musicToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  musicToggle.addEventListener('click', () => {
+    if (musicOpen) closeMusicPanel(); else openMusicPanel();
   });
 
   document.addEventListener('click', (e) => {
-    if (radioOpen && !radioWidget.contains(e.target)) closeRadioPanel();
+    if (musicOpen && !musicWidget.contains(e.target)) closeMusicPanel();
   });
 
-  radioPlayBtn.addEventListener('click', () => {
-    if (radioAudio.paused) {
-      if (!radioAudio.src) radioAudio.src = RADIO_STREAM_URL;
-      setRadioStatus('CONECTANDO...');
-      radioAudio.play().catch(() => setRadioStatus('SEM SINAL — TENTE DE NOVO'));
+  function loadTrack(index, autoplay){
+    if (!PLAYLIST.length) return;
+    trackIndex = (index + PLAYLIST.length) % PLAYLIST.length;
+    const track = PLAYLIST[trackIndex];
+    musicAudio.src = track.file;
+    musicTrackEl.textContent = track.title;
+    if (autoplay) {
+      setMusicStatus('CARREGANDO...');
+      musicAudio.play().catch(() => setMusicStatus('ERRO AO TOCAR ESSA FAIXA'));
+    }
+  }
+
+  musicPlayBtn.addEventListener('click', () => {
+    if (!PLAYLIST.length) return;
+    if (!musicAudio.src) {
+      loadTrack(trackIndex, true);
+    } else if (musicAudio.paused) {
+      musicAudio.play().catch(() => setMusicStatus('ERRO AO TOCAR ESSA FAIXA'));
     } else {
-      radioAudio.pause();
-      radioAudio.removeAttribute('src');
-      radioAudio.load();
-      radioWidget.classList.remove('playing');
-      setRadioStatus('PARADO');
+      musicAudio.pause();
     }
   });
 
-  radioAudio.addEventListener('playing', () => {
-    radioWidget.classList.add('playing');
-    setRadioStatus('AO VIVO');
+  musicPrevBtn.addEventListener('click', () => loadTrack(trackIndex - 1, true));
+  musicNextBtn.addEventListener('click', () => loadTrack(trackIndex + 1, true));
+
+  musicAudio.addEventListener('playing', () => {
+    musicWidget.classList.add('playing');
+    setMusicStatus('TOCANDO');
   });
 
-  radioAudio.addEventListener('error', () => {
-    radioWidget.classList.remove('playing');
-    setRadioStatus('SEM SINAL — TENTE DE NOVO');
+  musicAudio.addEventListener('pause', () => {
+    musicWidget.classList.remove('playing');
+    if (musicAudio.src) setMusicStatus('PAUSADO');
+  });
+
+  musicAudio.addEventListener('ended', () => loadTrack(trackIndex + 1, true));
+
+  musicAudio.addEventListener('error', () => {
+    musicWidget.classList.remove('playing');
+    setMusicStatus('ARQUIVO NÃO ENCONTRADO');
   });

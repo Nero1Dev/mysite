@@ -514,51 +514,61 @@
     font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bone-dim);letter-spacing:1px;
   }
 
-  /* RÁDIO: player flutuante no canto inferior direito — .radio-panel fica antes do
-     .radio-toggle no HTML pra abrir "pra dentro" (crescendo à esquerda), já que o
+  /* PLAYLIST: player flutuante no canto inferior direito — .music-panel fica antes do
+     .music-toggle no HTML pra abrir "pra dentro" (crescendo à esquerda), já que o
      container inteiro é ancorado pela borda direita (right:24px) */
-  .radio-widget{
+  .music-widget{
     position:fixed;right:24px;bottom:24px;z-index:500;
     display:flex;align-items:center;gap:10px;
   }
-  .radio-panel{
-    display:flex;align-items:center;gap:12px;
+  .music-panel{
+    display:flex;align-items:center;gap:10px;
     background:var(--night2);border:1px solid rgba(237,230,214,0.2);
     padding:0;border-radius:2px;
     max-width:0;overflow:hidden;opacity:0;
     transition:max-width .3s ease, opacity .25s ease, padding .3s ease;
     white-space:nowrap;
   }
-  .radio-widget.open .radio-panel{max-width:260px;opacity:1;padding:10px 14px 10px 18px;}
-  .radio-info{display:flex;flex-direction:column;gap:4px;}
-  .radio-info .radio-name{font-size:11px;letter-spacing:1.5px;color:var(--bone);}
-  .radio-info .radio-status{
+  .music-widget.open .music-panel{max-width:320px;opacity:1;padding:10px 14px;}
+  .music-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .music-info .music-track{font-size:11px;letter-spacing:1px;color:var(--bone);overflow:hidden;text-overflow:ellipsis;max-width:150px;}
+  .music-info .music-status{
     font-size:10px;letter-spacing:1px;color:var(--bone-dim);
     display:flex;align-items:center;gap:6px;
   }
-  .radio-info .radio-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bone-dim);flex-shrink:0;}
-  .radio-widget.playing .radio-info .radio-status::before{background:var(--gold);animation:radioPulse 1.4s infinite ease-in-out;}
-  @keyframes radioPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-  .radio-play{
+  .music-info .music-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--bone-dim);flex-shrink:0;}
+  .music-widget.playing .music-info .music-status::before{background:var(--gold);animation:musicPulse 1.4s infinite ease-in-out;}
+  @keyframes musicPulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  .music-nav{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    border:none;color:var(--bone-dim);background:transparent;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:color .2s ease;
+  }
+  .music-nav:hover{color:var(--gold);}
+  .music-nav svg{width:14px;height:14px;}
+  .music-widget.empty .music-nav,
+  .music-widget.empty .music-play{pointer-events:none;opacity:0.35;}
+  .music-play{
     width:34px;height:34px;border-radius:50%;flex-shrink:0;
     border:1px solid var(--gold);color:var(--gold);background:transparent;
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     transition:background .2s ease;
   }
-  .radio-play:hover{background:rgba(201,154,68,0.15);}
-  .radio-play svg{width:14px;height:14px;}
-  .radio-play .icon-pause{display:none;}
-  .radio-widget.playing .radio-play .icon-play{display:none;}
-  .radio-widget.playing .radio-play .icon-pause{display:block;}
-  .radio-toggle{
+  .music-play:hover{background:rgba(201,154,68,0.15);}
+  .music-play svg{width:14px;height:14px;}
+  .music-play .icon-pause{display:none;}
+  .music-widget.playing .music-play .icon-play{display:none;}
+  .music-widget.playing .music-play .icon-pause{display:block;}
+  .music-toggle{
     width:52px;height:52px;border-radius:50%;flex-shrink:0;
     background:var(--night2);border:1px solid rgba(237,230,214,0.25);color:var(--bone);
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     transition:border-color .2s ease, color .2s ease, background .2s ease;
   }
-  .radio-toggle:hover{border-color:var(--gold);color:var(--gold);}
-  .radio-toggle svg{width:22px;height:22px;}
-  .radio-widget.playing .radio-toggle{border-color:var(--gold);color:var(--gold);background:rgba(201,154,68,0.12);}
+  .music-toggle:hover{border-color:var(--gold);color:var(--gold);}
+  .music-toggle svg{width:22px;height:22px;}
+  .music-widget.playing .music-toggle{border-color:var(--gold);color:var(--gold);background:rgba(201,154,68,0.12);}
 
   @media(max-width:820px){
     header{padding:18px 6vw;}
@@ -569,8 +579,9 @@
     .servico-item{grid-template-columns:40px 1fr;}
     .servico-item p{grid-column:1/-1;}
     section{padding:90px 6vw;}
-    .radio-widget{right:16px;bottom:16px;}
-    .radio-widget.open .radio-panel{max-width:200px;}
+    .music-widget{right:16px;bottom:16px;}
+    .music-widget.open .music-panel{max-width:230px;}
+    .music-info .music-track{max-width:110px;}
   }
 
   [data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
