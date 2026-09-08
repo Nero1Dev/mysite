@@ -1,3 +1,17 @@
+/* BARRA DE PROGRESSO: linha no topo que preenche conforme a página rola */
+  const scrollProgress = document.getElementById('scrollProgress');
+
+  function updateScrollProgress(){
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = docHeight > 0 ? scrollTop / docHeight : 0;
+    scrollProgress.style.transform = `scaleX(${Math.min(Math.max(ratio, 0), 1)})`;
+  }
+
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+  window.addEventListener('resize', updateScrollProgress);
+  updateScrollProgress();
+
 /* FAIXA ANIMADA: repete as categorias o suficiente pra cobrir a tela inteira antes
      de dar a volta — em telas largas 2 cópias fixas deixavam um vão em branco no
      fim do loop; aqui a quantidade de cópias se ajusta à largura da janela */
